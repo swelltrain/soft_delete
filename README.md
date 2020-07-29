@@ -1,8 +1,6 @@
 # SoftDelete
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/soft_delete`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Soft delete active_record models.  Currently a WIP and not a released gem :)
 
 ## Installation
 
@@ -22,8 +20,35 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+SoftDelete works by setting `deleted_at` to Time.now.  Make sure your model has a `deleted_at` column.  And include the module into your active_record class:
 
+`include SoftDelete::SoftDeletable`
+
+`myModel.soft_delete` returns `true|false`
+
+`myModel.soft_delete!` raises `ActiveRecord::RecordInvalid` on failure
+
+You can also pass an optional `validate: false` argument to ignore validations on save.  This can be useful if you want to soft delete a record that is normally invalid.
+
+In general, SoftDelete considers "soft deleting" and "normal deleting" to be two separate things.  Under this philosophy, SoftDelete's default behavior is to do as little as possible (just set the `deleted_at` column).  There are no callbacks fired off, associations are not updated, etc.
+
+However, sometimes you want to handle soft deletes as if they are real deletes.  To that end, SoftDelete allows you to set a dependency behavior
+`include SoftDelete::SoftDeletable.dependent(:ignore|:default|:soft_delete)`
+* `:ignore`: The default.  Do nothing with associated records.
+* `:default`: Fire off the same action that is described by the active_record dsl in the model.  Exa (`has_many :enemies, default: :destroy`) would destroy the enemies when the model is soft deleted.
+* `:soft_delete`: overrides the `:destroy` association option to invoke a `soft_delete` on the associated records.  This comes the closest to automatically replacing normal deletes with soft deletes.  Note: this feature is currently incomplete in that the normal object lifecycle callbacks are not invoked.
+
+Caveats:
+SoftDelete uses a default_scope.
+
+SoftDelete uses a class var to hold the dependency behavior.  This has implications if you subclass.  All subclasses share the same class variable.
+
+On the roadmap:
+* More specs.
+* Complete the `soft_delete` feature to invoke AR callbacks.
+* Allow soft_delete feature to check if soft_delete is supported on associated model.  If not, let it fallback to destroy.
+* `SoftDelete::Recoverable` for completeness.
+* (Maybe?) allow the module to be included where it does not set a default scope.
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
