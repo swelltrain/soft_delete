@@ -106,8 +106,27 @@ RSpec.describe SoftDelete::SoftDeletable do
             expect { subject }.to change { Note.where(author_id: nil).count }.from(0).to(2)
           end
         end
-        context 'when the relation is dependent raise_with_exception'
-        context 'when the relation is dependent raise_with_error'
+        context 'when the relation is dependent restrict_with_exception' do
+          with_model :Author, scope: :all do
+            table do |t|
+              t.string :name
+              t.datetime :deleted_at
+            end
+
+            model do
+              include SoftDelete::SoftDeletable.dependent(:default)
+              has_many :notes, dependent: :restrict_with_exception
+            end
+          end
+          let(:author) { Author.create!(name: 'Stephen') }
+          let!(:note1) { Note.create!(title: 'note 1', author: author) }
+          let!(:note2) { Note.create!(title: 'note 2', author: author) }
+
+          it 'raises ActiveRecord::DeleteRestrictionError' do
+            expect { subject }.to raise_error(ActiveRecord::DeleteRestrictionError)
+          end
+        end
+        context 'when the relation is dependent restrict_with_error'
       end
       context 'when dependent soft_delete' do
         context 'when the relation is dependent destroy' do
