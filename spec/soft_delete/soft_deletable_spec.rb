@@ -66,7 +66,26 @@ RSpec.describe SoftDelete::SoftDeletable do
             expect { subject }.to change { Note.unscoped.count }.from(2).to(0)
           end
         end
-        context 'when the relation is dependent delete_all'
+        context 'when the relation is dependent delete_all' do
+          with_model :Author, scope: :all do
+            table do |t|
+              t.string :name
+              t.datetime :deleted_at
+            end
+
+            model do
+              include SoftDelete::SoftDeletable.dependent(:default)
+              has_many :notes, dependent: :delete_all
+            end
+          end
+          let(:author) { Author.create!(name: 'Stephen') }
+          let!(:note1) { Note.create!(title: 'note 1', author: author) }
+          let!(:note2) { Note.create!(title: 'note 2', author: author) }
+
+          it 'deletes the related records' do
+            expect { subject }.to change { Note.unscoped.count }.from(2).to(0)
+          end
+        end
         context 'when the relation is dependent nullify'
         context 'when the relation is dependent raise_with_exception'
         context 'when the relation is dependent raise_with_error'
