@@ -26,14 +26,19 @@ module SoftDelete
 
     def soft_delete(validate: true)
       soft_delete!(validate: validate)
-      handle_soft_delete_dependencies
     rescue ActiveRecord::RecordInvalid
       false
     end
 
     def soft_delete!(validate: true)
-      self.deleted_at = Time.now
-      save!(validate: validate)
+      ActiveRecord::Base.transaction do
+
+        handle_soft_delete_dependencies
+        run_callbacks(:destroy)
+
+        self.deleted_at = Time.now
+        save!(validate: validate)
+      end
     end
 
     private
@@ -58,8 +63,6 @@ module SoftDelete
         next unless assn.options[:dependent] == :destroy
 
         # TODO: pass in validate
-        # decide: to bang or not to bang?
-        # handle failure
         assn.load_target.each(&:soft_delete!)
 
         # see:

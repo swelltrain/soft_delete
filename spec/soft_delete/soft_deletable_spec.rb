@@ -139,6 +139,11 @@ RSpec.describe SoftDelete::SoftDeletable do
             model do
               include SoftDelete::SoftDeletable.dependent(:soft_delete)
               has_many :notes, dependent: :destroy
+              before_destroy :set_name
+
+              def set_name
+                self.name = 'destroyed'
+              end
             end
           end
           let(:author) { Author.create!(name: 'Stephen') }
@@ -150,6 +155,13 @@ RSpec.describe SoftDelete::SoftDeletable do
               subject
             }.to change { Note.count }.from(2).to(0)
              .and change { Note.unscoped.count }.by(0)
+          end
+
+          describe 'before_destroy callback' do
+            it 'runs the callback' do
+              subject
+              expect(author.reload.name).to eq('destroyed')
+            end
           end
         end
       end
