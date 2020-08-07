@@ -32,7 +32,6 @@ module SoftDelete
 
     def soft_delete!(validate: true)
       ActiveRecord::Base.transaction do
-
         handle_soft_delete_dependencies
         run_callbacks(:destroy)
 

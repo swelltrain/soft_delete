@@ -45,7 +45,6 @@ SoftDelete uses a class var to hold the dependency behavior.  This has implicati
 
 On the roadmap:
 * More specs.
-* Complete the `soft_delete` feature to invoke AR callbacks.
 * Allow soft_delete feature to check if soft_delete is supported on associated model.  If not, let it fallback to destroy.
 * `SoftDelete::Recoverable` for completeness.
 * (Maybe?) allow the module to be included where it does not set a default scope.
