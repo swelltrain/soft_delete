@@ -32,7 +32,7 @@ module SoftDelete
 
     def soft_delete!(validate: true)
       ActiveRecord::Base.transaction do
-        handle_soft_delete_dependencies
+        handle_soft_delete_dependency_behavior
         run_callbacks(:destroy)
 
         self.deleted_at = Time.now
@@ -42,7 +42,7 @@ module SoftDelete
 
     private
 
-    def handle_soft_delete_dependencies
+    def handle_soft_delete_dependency_behavior
       return unless @@soft_delete_dependency_behavior.present?
 
       case @@soft_delete_dependency_behavior

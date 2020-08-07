@@ -144,7 +144,6 @@ RSpec.describe SoftDelete::SoftDeletable do
               def set_name
                 self.name = 'destroyed'
               end
-
             end
           end
           let(:author) { Author.create!(name: 'Stephen') }
