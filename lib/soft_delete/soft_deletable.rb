@@ -33,10 +33,10 @@ module SoftDelete
     def soft_delete!(validate: true)
       ActiveRecord::Base.transaction do
         handle_soft_delete_dependency_behavior
-        run_callbacks(:destroy)
-
-        self.deleted_at = Time.now
-        save!(validate: validate)
+        run_callbacks(:destroy) do
+          self.deleted_at = Time.now
+          save!(validate: validate)
+        end
       end
     end
 

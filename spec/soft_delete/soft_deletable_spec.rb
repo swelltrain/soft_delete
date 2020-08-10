@@ -35,7 +35,6 @@ RSpec.describe SoftDelete::SoftDeletable do
       end
     end
 
-    let(:author) { Author.create!(name: 'Stephen') }
     let!(:note1) { Note.create!(title: 'note 1') }
     let!(:note2) { Note.create!(title: 'note 2') }
 
@@ -139,11 +138,15 @@ RSpec.describe SoftDelete::SoftDeletable do
             model do
               include SoftDelete::SoftDeletable.dependent(:soft_delete)
               has_many :notes, dependent: :destroy
-              before_destroy :set_name
+              before_destroy :before
+              around_destroy :around
+              after_destroy :after
 
-              def set_name
-                self.name = 'destroyed'
-              end
+              def before; end
+
+              def around; end
+
+              def after; end
             end
           end
           let(:author) { Author.create!(name: 'Stephen') }
@@ -157,10 +160,12 @@ RSpec.describe SoftDelete::SoftDeletable do
              .and change { Note.unscoped.count }.by(0)
           end
 
-          describe 'before_destroy callback' do
-            it 'runs the callback' do
+          describe 'callbacks' do
+            it 'runs the callbacks in order' do
+              expect(author).to receive(:before).ordered
+              expect(author).to receive(:around).ordered
+              expect(author).to receive(:after).ordered
               subject
-              expect(author.reload.name).to eq('destroyed')
             end
           end
         end
