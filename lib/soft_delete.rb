@@ -3,3 +3,4 @@
 require 'active_record'
 require 'soft_delete/version'
 require 'soft_delete/soft_deletable'
+require 'soft_delete/restorable'

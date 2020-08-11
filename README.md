@@ -61,7 +61,6 @@ SoftDelete uses a default_scope.
 SoftDelete uses a class var to hold the dependency behavior.  This has implications if you subclass a model that includes SoftDelete.  All subclasses share the same class variable and therefore would share the same soft delete dependency behavior.
 
 On the roadmap:
-* `SoftDelete::Recoverable` for completeness.
 * before|after soft_delete hooks.
 * (Maybe?) allow the module to be included where it does not set a default scope.
 
