@@ -19,6 +19,36 @@ RSpec.describe SoftDelete::SoftDeletable do
     end
   end
 
+  describe ".not_scoped" do
+    with_model :Note, scope: :all do
+      table do |t|
+        t.string :title
+        t.datetime :deleted_at
+        t.integer :author_id
+      end
+
+      model do
+        include SoftDelete::SoftDeletable.not_scoped
+        belongs_to :author
+      end
+    end
+    let!(:note) { Note.create!(title: 'note 1') }
+
+    it "does not include a default scope" do
+      expect { note.soft_delete }.not_to change { Note.count }.from(1)
+    end
+
+    it "includes an active scope" do
+      expect(Note.active.first).to eq(note)
+      note.soft_delete!
+      expect(Note.active).to be_empty
+    end
+
+    it 'returns self' do
+      expect(described_class.not_scoped).to eq(described_class)
+    end
+  end
+
   describe '#soft_delete' do
     subject { note2.soft_delete }
 

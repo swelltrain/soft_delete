@@ -5,9 +5,20 @@ module SoftDelete
   module SoftDeletable
     extend ActiveSupport::Concern
     @@soft_delete_dependency_behavior = nil
+    @@include_default_scope = true
 
     included do
-      default_scope { where(deleted_at: nil) }
+      if @@include_default_scope
+        default_scope { where(deleted_at: nil) }
+      else
+        scope :active, -> { where(deleted_at: nil) }
+      end
+    end
+
+    def self.not_scoped
+      @@include_default_scope = false
+
+      self
     end
 
     # descibes how soft delete should handle dependencies

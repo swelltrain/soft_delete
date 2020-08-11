@@ -44,6 +44,7 @@ RSpec.describe SoftDelete::Restorable do
     context "when skipping validations" do
       let(:note) { Note.create(title: "some note", deleted_at: Time.now) }
       let(:validate) { false }
+
       it "restores an otherwise invalid record" do
         expect(note.valid?).to eq(false)
         expect { subject }.to change{ Note.count }.by(1)

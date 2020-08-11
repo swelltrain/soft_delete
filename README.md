@@ -55,8 +55,11 @@ However, sometimes you want to handle soft deletes as if they are real deletes. 
 * `:soft_delete`: overrides the `:destroy` association option to invoke a `soft_delete` on the associated records.  This comes the closest to automatically replacing normal deletes with soft deletes.  It runs before|around|after destroy hooks when it soft deletes.
 
 
-## Caveats
-SoftDelete uses a default_scope.
+## Default Scope
+By default, SoftDelete uses a default_scope.  Do you feel strongly that a default scope is not for you?  SoftDelete can be included without a default scope:
+`include SoftDelete::SoftDeletable.not_scoped`
+
+This will skip adding a default scope to the model and instead will add an `active` scope that can be used to filter the records.
 
 SoftDelete uses a class var to hold the dependency behavior.  This has implications if you subclass a model that includes SoftDelete.  All subclasses share the same class variable and therefore would share the same soft delete dependency behavior.
 
