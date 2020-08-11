@@ -22,7 +22,7 @@ Or install it yourself as:
 
 SoftDelete works by setting `deleted_at` to Time.now.  Make sure your model has a `deleted_at` column.  And include the module into your active_record class:
 
-```
+```ruby
 class MyModel < ApplicationRecord
   include SoftDelete::SoftDeletable
 
@@ -38,7 +38,7 @@ You can also pass an optional `validate: false` argument to ignore validations o
 
 Exa:
 
-```
+```ruby
 foo.valid?
 > false
 foo.soft_delete(validate: false)
@@ -46,6 +46,7 @@ foo.soft_delete(validate: false)
 ```
 
 ## Dependency Behavior
+
 In general, SoftDelete considers "soft deleting" and "normal deleting" to be two separate things.  Under this philosophy, SoftDelete's default behavior is to do as little as possible (just set the `deleted_at` column).  There are no callbacks fired off, associations are not updated, etc.
 
 However, sometimes you want to handle soft deletes as if they are real deletes.  To that end, SoftDelete allows you to set a dependency behavior
@@ -56,16 +57,19 @@ However, sometimes you want to handle soft deletes as if they are real deletes. 
 
 
 ## Default Scope
+
 By default, SoftDelete uses a default_scope.  Do you feel strongly that a default scope is not for you?  SoftDelete can be included without a default scope:
 `include SoftDelete::SoftDeletable.not_scoped`
 
-This will skip adding a default scope to the model and instead will add an `active` scope that can be used to filter the records.
+This will skip adding a default scope to the model and instead will add an `active` scope that you can use to filter the records.
 
-SoftDelete uses a class var to hold the dependency behavior.  This has implications if you subclass a model that includes SoftDelete.  All subclasses share the same class variable and therefore would share the same soft delete dependency behavior.
+## Caveat
 
-On the roadmap:
+SoftDelete uses a class var to hold the dependency behavior.  This has implications if you subclass a model that includes SoftDelete.  All subclasses share the same class variable and therefore would share the same soft delete dependency behavior.  Changing it in a subclass changes it for the ancestors as well as any children.
+
+## Roadmap:
+
 * before|after soft_delete hooks.
-* (Maybe?) allow the module to be included where it does not set a default scope.
 
 ## Development
 
