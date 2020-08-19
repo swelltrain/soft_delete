@@ -9,7 +9,7 @@ Why another soft delete?  Soft deleting is a relatively common pattern which let
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'soft_delete'
+gem 'ar_soft_delete'
 ```
 
 And then execute:
@@ -18,7 +18,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install soft_delete
+    $ gem install ar_soft_delete
 
 ## Usage
 

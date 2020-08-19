@@ -1,7 +1,7 @@
 require_relative 'lib/soft_delete/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "soft_delete"
+  spec.name          = "ar_soft_delete"
   spec.version       = SoftDelete::VERSION
   spec.authors       = ["Stephen Philp"]
   spec.email         = ["swelltrain@gmail.com"]
