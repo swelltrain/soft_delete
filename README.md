@@ -1,6 +1,8 @@
 # SoftDelete
 
-(Yet another ha ha) Soft delete active_record models.  Currently a WIP and not a released gem :)
+(Yet another) Soft delete active_record models.  
+
+Why another soft delete?  Soft deleting is a relatively common pattern which lets you hide records instead of deleting them.  Some gems are heavy handed and override normal deleting.  Most of them make a lot of decisions or assumptions about how you will be soft deleting.  This gem takes an open approach and lets you decide how little or how much your project will be using the soft delete pattern.  It can be configured on a per-model level to use whichever features are appropriate at the time.  This makes it especially easy to introduce soft delete into existing projects.
 
 ## Installation
 
@@ -20,10 +22,10 @@ Or install it yourself as:
 
 ## Usage
 
-SoftDelete works by setting `deleted_at` to Time.now.  Make sure your model has a `deleted_at` column.  And include the module into your active_record class:
+SoftDelete works by setting `deleted_at` to Time.now.  Make sure your model has a datetime `deleted_at` column.  And include the module into your active_record class:
 
 ```ruby
-class MyModel < ApplicationRecord
+class Author < ApplicationRecord
   include SoftDelete::SoftDeletable
 
   ...
@@ -51,10 +53,21 @@ In general, SoftDelete considers "soft deleting" and "normal deleting" to be two
 
 However, sometimes you want to handle soft deletes as if they are real deletes.  To that end, SoftDelete allows you to set a dependency behavior
 `include SoftDelete::SoftDeletable.dependent(:ignore|:default|:soft_delete)`
-* `:ignore`: The default.  Do nothing with associated records.  Useful if you want to soft delete specific records with no other side effects.
+* `:ignore`: The default.  Do nothing with associated records.  Useful if you want to soft delete specific records with no other side effects.  Example use case:
+I have identified bad data.  I want to be able to delete the data, see the ramifications and potentially quickly restore the data if the delete was a mistake.
 * `:default`: Fire off the same action that is described by the active_record dsl in the model.  Exa (`has_many :enemies, default: :destroy`) would destroy the enemies when the model is soft deleted.  This is useful if you are incrementally adding soft delete to certain models and want the rest of the behavior to remain the same.
 * `:soft_delete`: overrides the `:destroy` association option to invoke a `soft_delete` on the associated records.  This comes the closest to automatically replacing normal deletes with soft deletes.  It runs before|around|after destroy hooks when it soft deletes.
 
+Exa:
+
+```ruby
+class Author < ApplicationRecord
+  include SoftDelete::SoftDeletable.dependent(:soft_delete)
+
+  has_many :notes, dependent: :destroy
+  ...
+end
+```
 
 ## Default Scope
 
@@ -63,11 +76,26 @@ By default, SoftDelete uses a default_scope.  Do you feel strongly that a defaul
 
 This will skip adding a default scope to the model and instead will add an `active` scope that you can use to filter the records.
 
-## Caveat
+## SoftDelete Restorable
+
+You can also include the `SoftDelete::Restorable` module to include a `deleted` scope which overrides the default `deleted_at` scope if it exists.  It also mixes in `restore_soft_delete` and `restore_soft_delete!`.  They both can take an optional `validate` param to restore an otherwise invalid record.
+
+exa:
+```ruby
+note = Note.deleted.find_by(id: 2)
+note.valid?
+> false
+note.restore_soft_delete(validate: false)
+> true
+```
+
+## Caveats
 
 SoftDelete uses a class var to hold the dependency behavior.  This has implications if you subclass a model that includes SoftDelete.  All subclasses share the same class variable and therefore would share the same soft delete dependency behavior.  Changing it in a subclass changes it for the ancestors as well as any children.
 
-## Roadmap:
+SoftDelete does not currently support updating cache counters when a record is soft deleted.
+
+## Roadmap
 
 * before|after soft_delete hooks.
 
@@ -79,7 +107,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/soft_delete.
+Bug reports and pull requests are welcome on GitHub at https://github.com/swelltrain/soft_delete.
 
 
 ## License
