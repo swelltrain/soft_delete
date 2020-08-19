@@ -6,17 +6,17 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Stephen Philp"]
   spec.email         = ["swelltrain@gmail.com"]
 
-  spec.summary       = %q{}
-  spec.description   = %q{}
+  spec.summary       = %q(Soft delete active_record models.)
+  spec.description   = %q(This gem takes an open approach and lets you decide
+    how little or how much your project will be using the soft delete pattern.
+    It can be configured on a per-model level to use whichever features
+    are appropriate at the time.  This makes it especially easy to introduce
+    soft delete into existing projects.)
   # spec.homepage      = "TODO: Put your gem's website or public repo URL here."
   spec.license       = "MIT"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.3.0")
 
-  spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
-
-  # spec.metadata["homepage_uri"] = spec.homepage
-  # spec.metadata["source_code_uri"] = "TODO: Put your gem's public repo URL here."
-  # spec.metadata["changelog_uri"] = "TODO: Put your gem's CHANGELOG.md URL here."
+  spec.metadata["source_code_uri"] = "https://github.com/swelltrain/soft_delete"
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
