@@ -29,7 +29,6 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'activerecord', '>= 4.2', '<7'
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'byebug'
   spec.add_development_dependency 'database_cleaner', '~> 1.5'
   spec.add_development_dependency 'rake', '>= 12.3.3'
   spec.add_development_dependency 'rspec', '~> 3.5.0'
