@@ -76,9 +76,30 @@ By default, SoftDelete uses a default_scope.  Do you feel strongly that a defaul
 
 This will skip adding a default scope to the model and instead will add an `active` scope that you can use to filter the records.
 
+Reminder: You can chain the scope and dependency options!
+
+```ruby
+class Author < ApplicationRecord
+  include SoftDelete::SoftDeletable.not_scoped.dependency(:default)
+
+  has_many :notes, dependent: :destroy
+end
+```
+
 ## SoftDelete Restorable
 
-You can also include the `SoftDelete::Restorable` module to include a `deleted` scope which overrides the default `deleted_at` scope if it exists.  It also mixes in `restore_soft_delete` and `restore_soft_delete!`.  They both can take an optional `validate` param to restore an otherwise invalid record.
+You can also include the `SoftDelete::Restorable` module to include a `deleted` scope which overrides the default `deleted_at` scope if it exists.
+
+```ruby
+class Note < ApplicationRecord
+  include SoftDelete::Restorable
+  ...
+end
+
+Note.deleted # returns records that have been soft deleted
+```
+
+It also mixes in `restore_soft_delete` and `restore_soft_delete!`.  They both can take an optional `validate` param to restore an otherwise invalid record.
 
 exa:
 ```ruby
