@@ -80,7 +80,7 @@ Reminder: You can chain the scope and dependency options!
 
 ```ruby
 class Author < ApplicationRecord
-  include SoftDelete::SoftDeletable.not_scoped.dependency(:default)
+  include SoftDelete::SoftDeletable.not_scoped.dependent(:default)
 
   has_many :notes, dependent: :destroy
 end
