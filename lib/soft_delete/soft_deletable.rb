@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module SoftDelete
-  # TODO: wrap in a transaction
   module SoftDeletable
     extend ActiveSupport::Concern
     @@soft_delete_dependency_behavior = nil
