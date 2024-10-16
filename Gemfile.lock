@@ -23,7 +23,6 @@ GEM
     diff-lcs (1.5.1)
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)
-    mini_portile2 (2.8.7)
     minitest (5.25.1)
     rake (12.3.3)
     rspec (3.13.0)
@@ -39,8 +38,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.1)
-    sqlite3 (2.0.4)
-      mini_portile2 (~> 2.8.0)
+    sqlite3 (1.7.3-aarch64-linux)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     with_model (2.1.7)
@@ -57,7 +55,7 @@ DEPENDENCIES
   database_cleaner (~> 1.5)
   rake (~> 12.0)
   rspec (~> 3.0)
-  sqlite3
+  sqlite3 (~> 1.4)
   with_model (~> 2.0)
 
 BUNDLED WITH
