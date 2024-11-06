@@ -20,6 +20,12 @@ module SoftDelete
       self
     end
 
+    def self.scoped
+      @@include_default_scope = true
+
+      self
+    end
+
     # descibes how soft delete should handle dependencies
     # ignore
     # ignore dependencies and do nothing. this is the default behavior
