@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe SoftDelete::SoftDeletable do
-  describe ".dependent" do
+  describe '.dependent' do
     subject { described_class.dependent(behavior) }
 
     let(:behavior) { :ignore }
@@ -18,7 +18,7 @@ RSpec.describe SoftDelete::SoftDeletable do
     end
   end
 
-  describe ".not_scoped" do
+  describe '.not_scoped' do
     with_model :Note, scope: :all do
       table do |t|
         t.string :title
@@ -33,11 +33,11 @@ RSpec.describe SoftDelete::SoftDeletable do
     end
     let!(:note) { Note.create!(title: 'note 1') }
 
-    it "does not include a default scope" do
+    it 'does not include a default scope' do
       expect { note.soft_delete }.not_to change { Note.count }.from(1)
     end
 
-    it "includes an active scope" do
+    it 'includes an active scope' do
       expect(Note.active.first).to eq(note)
       note.soft_delete!
       expect(Note.active).to be_empty
@@ -59,7 +59,8 @@ RSpec.describe SoftDelete::SoftDeletable do
       end
 
       model do
-        include SoftDelete::SoftDeletable
+        # quirk of with_model...
+        include SoftDelete::SoftDeletable.scoped
         belongs_to :author
       end
     end
@@ -183,10 +184,8 @@ RSpec.describe SoftDelete::SoftDeletable do
           let!(:note2) { Note.create!(title: 'note 2', author: author) }
 
           it 'soft deletes the related records' do
-            expect {
-              subject
-            }.to change { Note.count }.from(2).to(0)
-             .and change { Note.unscoped.count }.by(0)
+            expect { subject }.to change { Note.count }.from(2).to(0)
+                                                       .and change { Note.unscoped.count }.by(0)
           end
 
           describe 'callbacks' do
