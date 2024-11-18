@@ -8,9 +8,9 @@ module SoftDelete
 
     included do
       if @@include_default_scope
-        default_scope { where(deleted_at: nil) }
+        default_scope { where(SoftDelete.configuration.target_column => nil) }
       else
-        scope :active, -> { where(deleted_at: nil) }
+        scope :active, -> { where(SoftDelete.configuration.target_column => nil) }
       end
     end
 
@@ -50,7 +50,7 @@ module SoftDelete
       ActiveRecord::Base.transaction do
         handle_soft_delete_dependency_behavior
         run_callbacks(:destroy) do
-          self.deleted_at = Time.now
+          public_send("#{SoftDelete.configuration.target_column}=", Time.now)
           save!(validate: validate)
         end
       end

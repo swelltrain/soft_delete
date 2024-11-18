@@ -200,4 +200,44 @@ RSpec.describe SoftDelete::SoftDeletable do
       end
     end
   end
+
+  describe '#user defined column name' do
+    subject { note2.soft_delete }
+
+    around do |example|
+      original_column = SoftDelete.configuration.target_column
+      SoftDelete.configure do |config|
+        config.target_column = :archived_at
+      end
+
+      example.run
+
+      # Reset to the original configuration after the block
+      SoftDelete.configure do |config|
+        config.target_column = original_column
+      end
+    end
+
+    with_model :Note, scope: :all do
+      table do |t|
+        t.string :title
+        t.datetime :archived_at
+        t.integer :author_id
+      end
+
+      model do
+        # quirk of with_model...
+        include SoftDelete::SoftDeletable.scoped
+        belongs_to :author
+      end
+    end
+
+    let!(:note1) { Note.create!(title: 'note 1') }
+    let!(:note2) { Note.create!(title: 'note 2') }
+
+    it 'hides the record' do
+      expect { subject }.to change { Note.count }.from(2).to(1)
+      expect(note2.reload.archived_at).not_to be_nil
+    end
+  end
 end

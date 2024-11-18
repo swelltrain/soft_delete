@@ -22,7 +22,16 @@ Or install it yourself as:
 
 ## Usage
 
-SoftDelete works by setting `deleted_at` to Time.now.  Make sure your model has a datetime `deleted_at` column.  And include the module into your active_record class:
+SoftDelete works by setting `deleted_at` to Time.now.  Make sure your model has a datetime `deleted_at` column or if you want to use any other user defined column name for you model make sure to define it in initializer like below.
+
+```ruby
+# config/initializers/soft_delete.rb (for Rails app) or similar setup in any Ruby app
+SoftDelete.configure do |config|
+  config.target_column = :archived_at # user defined column name
+end
+```
+
+Include the module into your active_record class:
 
 ```ruby
 class Author < ApplicationRecord

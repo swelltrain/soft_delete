@@ -62,6 +62,7 @@ GEM
       parser (>= 3.3.1.0)
     ruby-progressbar (1.13.0)
     sqlite3 (1.7.3-aarch64-linux)
+    sqlite3 (1.7.3-arm64-darwin)
     sqlite3 (1.7.3-x86_64-linux)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
@@ -72,6 +73,7 @@ GEM
 
 PLATFORMS
   aarch64-linux
+  arm64-darwin-23
   x86_64-linux
 
 DEPENDENCIES
