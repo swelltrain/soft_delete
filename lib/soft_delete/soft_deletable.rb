@@ -78,7 +78,11 @@ module SoftDelete
         next unless assn.options[:dependent] == :destroy
 
         # TODO: pass in validate
-        assn.load_target.each(&:soft_delete!)
+        if assn.load_target.is_a?(ActiveRecord::Relation)
+          assn.load_target.each(&:soft_delete!)
+        else
+          assn.load_target.soft_delete!
+        end
 
         # see:
         # https://github.com/rails/rails/blob/master/activerecord/lib/active_record/associations/collection_association.rb#L174

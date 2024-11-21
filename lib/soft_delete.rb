@@ -4,7 +4,7 @@ require 'active_record'
 require 'soft_delete/version'
 require 'soft_delete/soft_deletable'
 require 'soft_delete/restorable'
-require_relative 'soft_delete/configuration'
+require 'soft_delete/configuration'
 
 # This is gem main module
 module SoftDelete
