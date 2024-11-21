@@ -65,6 +65,20 @@ RSpec.describe SoftDelete::SoftDeletable do
       end
     end
 
+    with_model :Reminder, scope: :all do
+      table do |t|
+        t.string :title
+        t.datetime :deleted_at
+        t.integer :author_id
+      end
+
+      model do
+        # quirk of with_model...
+        include SoftDelete::SoftDeletable.scoped
+        belongs_to :author
+      end
+    end
+
     let!(:note1) { Note.create!(title: 'note 1') }
     let!(:note2) { Note.create!(title: 'note 2') }
 
@@ -85,14 +99,20 @@ RSpec.describe SoftDelete::SoftDeletable do
             model do
               include SoftDelete::SoftDeletable.dependent(:default)
               has_many :notes, dependent: :destroy
+              has_one :reminder, dependent: :destroy
             end
           end
           let(:author) { Author.create!(name: 'Stephen') }
+          let!(:reminder) { Reminder.create!(title: 'reminder', author: author) }
           let!(:note1) { Note.create!(title: 'note 1', author: author) }
           let!(:note2) { Note.create!(title: 'note 2', author: author) }
 
-          it 'destroys the related records' do
+          it 'destroys the has_many related records' do
             expect { subject }.to change { Note.unscoped.count }.from(2).to(0)
+          end
+
+          it 'destroys the has_one related record' do
+            expect { subject }.to change { Reminder.unscoped.count }.from(1).to(0)
           end
         end
         context 'when the relation is dependent delete_all' do
@@ -111,7 +131,7 @@ RSpec.describe SoftDelete::SoftDeletable do
           let!(:note1) { Note.create!(title: 'note 1', author: author) }
           let!(:note2) { Note.create!(title: 'note 2', author: author) }
 
-          it 'deletes the related records' do
+          it 'deletes the has_many related records' do
             expect { subject }.to change { Note.unscoped.count }.from(2).to(0)
           end
         end
@@ -127,11 +147,12 @@ RSpec.describe SoftDelete::SoftDeletable do
               has_many :notes, dependent: :nullify
             end
           end
+
           let(:author) { Author.create!(name: 'Stephen') }
           let!(:note1) { Note.create!(title: 'note 1', author: author) }
           let!(:note2) { Note.create!(title: 'note 2', author: author) }
 
-          it 'nullifies the related records' do
+          it 'nullifies the has_many related records' do
             expect { subject }.to change { Note.where(author_id: nil).count }.from(0).to(2)
           end
         end
