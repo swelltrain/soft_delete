@@ -78,7 +78,7 @@ module SoftDelete
         next unless assn.options[:dependent] == :destroy
 
         # TODO: pass in validate
-        if assn.load_target.is_a?(ActiveRecord::Relation)
+        if assn.load_target.respond_to?(:each)
           assn.load_target.each(&:soft_delete!)
         else
           assn.load_target.soft_delete!
