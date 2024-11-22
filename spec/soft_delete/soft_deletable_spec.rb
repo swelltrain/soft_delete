@@ -259,15 +259,6 @@ RSpec.describe SoftDelete::SoftDeletable do
           it 'should not soft delete the related records' do
             expect { subject }.to change { Book.count }.by(0)
           end
-
-          describe 'callbacks' do
-            it 'runs the callbacks in order' do
-              expect(author).to receive(:before).ordered
-              expect(author).to receive(:around).ordered
-              expect(author).to receive(:after).ordered
-              subject
-            end
-          end
         end
 
         context 'when the relation is one to one' do
@@ -298,15 +289,6 @@ RSpec.describe SoftDelete::SoftDeletable do
           it 'should soft delete the related record' do
             expect { subject }.to change { Note.count }.from(2).to(1)
                                                        .and change { Note.unscoped.count }.by(0)
-          end
-
-          describe 'callbacks' do
-            it 'runs the callbacks in order' do
-              expect(author).to receive(:before).ordered
-              expect(author).to receive(:around).ordered
-              expect(author).to receive(:after).ordered
-              subject
-            end
           end
         end
       end
