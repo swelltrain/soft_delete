@@ -218,6 +218,97 @@ RSpec.describe SoftDelete::SoftDeletable do
             end
           end
         end
+
+        context 'when the relation is not using soft delete' do
+          with_model :Author, scope: :all do
+            table do |t|
+              t.string :name
+              t.datetime :deleted_at
+            end
+
+            model do
+              include SoftDelete::SoftDeletable.dependent(:soft_delete)
+              has_many :books, dependent: :destroy
+              before_destroy :before
+              around_destroy :around
+              after_destroy :after
+
+              def before; end
+
+              def around; end
+
+              def after; end
+            end
+          end
+
+          with_model :Book, scope: :all do
+            table do |t|
+              t.string :title
+              t.integer :author_id
+            end
+
+            model do
+              belongs_to :author
+            end
+          end
+
+          let(:author) { Author.create!(name: 'Stephen') }
+          let!(:book1) { Book.create!(title: 'book 1', author: author) }
+          let!(:book2) { Book.create!(title: 'book 2', author: author) }
+
+          it 'should not soft delete the related records' do
+            expect { subject }.to change { Book.count }.by(0)
+          end
+
+          describe 'callbacks' do
+            it 'runs the callbacks in order' do
+              expect(author).to receive(:before).ordered
+              expect(author).to receive(:around).ordered
+              expect(author).to receive(:after).ordered
+              subject
+            end
+          end
+        end
+
+        context 'when the relation is one to one' do
+          with_model :Author, scope: :all do
+            table do |t|
+              t.string :name
+              t.datetime :deleted_at
+            end
+
+            model do
+              include SoftDelete::SoftDeletable.dependent(:soft_delete)
+              has_one :note, dependent: :destroy
+              before_destroy :before
+              around_destroy :around
+              after_destroy :after
+
+              def before; end
+
+              def around; end
+
+              def after; end
+            end
+          end
+
+          let(:author) { Author.create!(name: 'Stephen') }
+          let!(:note1) { Note.create!(title: 'note 1', author: author) }
+
+          it 'should soft delete the related record' do
+            expect { subject }.to change { Note.count }.from(2).to(1)
+                                                       .and change { Note.unscoped.count }.by(0)
+          end
+
+          describe 'callbacks' do
+            it 'runs the callbacks in order' do
+              expect(author).to receive(:before).ordered
+              expect(author).to receive(:around).ordered
+              expect(author).to receive(:after).ordered
+              subject
+            end
+          end
+        end
       end
     end
   end
