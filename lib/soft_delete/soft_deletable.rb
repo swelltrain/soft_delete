@@ -80,14 +80,16 @@ module SoftDelete
         next unless assn.options[:dependent] == :destroy
 
         # TODO: pass in validate
-        Array(assn.load_target).each do |target|
-          next if @@skip_dependent_soft_delete.include?(target.class.name)
-
-          target.soft_delete!
+        associated_records = Array(assn.load_target)
+        if @@skip_dependent_soft_delete.include?(associated_records.first.class.name)
+          # see:
+          # https://github.com/rails/rails/blob/master/activerecord/lib/active_record/associations/collection_association.rb#L174
+          assn.reset
+          assn.loaded!
+          next
         end
+        associated_records.each(&:soft_delete!)
 
-        # see:
-        # https://github.com/rails/rails/blob/master/activerecord/lib/active_record/associations/collection_association.rb#L174
         assn.reset
         assn.loaded!
       end
