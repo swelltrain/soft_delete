@@ -229,15 +229,6 @@ RSpec.describe SoftDelete::SoftDeletable do
             model do
               include SoftDelete::SoftDeletable.dependent(:soft_delete)
               has_many :books, dependent: :destroy
-              before_destroy :before
-              around_destroy :around
-              after_destroy :after
-
-              def before; end
-
-              def around; end
-
-              def after; end
             end
           end
 
@@ -256,6 +247,38 @@ RSpec.describe SoftDelete::SoftDeletable do
           let!(:book1) { Book.create!(title: 'book 1', author: author) }
           let!(:book2) { Book.create!(title: 'book 2', author: author) }
 
+          it 'raises NoMethodError for soft_delete! on Book' do
+            expect { subject }.to raise_error(NoMethodError, /undefined method `soft_delete!' for #<Book/)
+          end
+        end
+
+        context 'when the relation is not using soft delete but skipping soft delete for association' do
+          with_model :Author, scope: :all do
+            table do |t|
+              t.string :name
+              t.datetime :deleted_at
+            end
+
+            model do
+              include SoftDelete::SoftDeletable.dependent(
+                :soft_delete, skip_dependent_soft_delete: ['Book']
+              )
+              has_many :books, dependent: :destroy
+            end
+          end
+
+          with_model :Book, scope: :all do
+            table do |t|
+              t.string :title
+              t.integer :author_id
+            end
+
+            model do
+              belongs_to :author
+            end
+          end
+          let(:author) { Author.create!(name: 'Stephen') }
+          let!(:book1) { Book.create!(title: 'book 1', author: author) }
           it 'should not soft delete the related records' do
             expect { subject }.to change { Book.count }.by(0)
           end
@@ -271,15 +294,6 @@ RSpec.describe SoftDelete::SoftDeletable do
             model do
               include SoftDelete::SoftDeletable.dependent(:soft_delete)
               has_one :note, dependent: :destroy
-              before_destroy :before
-              around_destroy :around
-              after_destroy :after
-
-              def before; end
-
-              def around; end
-
-              def after; end
             end
           end
 
