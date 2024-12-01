@@ -78,6 +78,20 @@ class Author < ApplicationRecord
 end
 ```
 
+However if you still feel like skipping soft delete over certain associations, you can acheive so by passing an array of skipping Model Names to dependent soft delete for example:
+
+```ruby
+class Author < ApplicationRecord
+  include SoftDelete::SoftDeletable.dependent(:soft_delete, skip_dependent_soft_delete: ['Publisher'])
+
+  has_many :notes, dependent: :destroy
+  has_many :publishers, dependent: :destroy
+  ...
+end
+```
+
+In the above example Notes would be soft deleted but publishers would be skipped to be soft deleted.
+
 ## Default Scope
 
 By default, SoftDelete uses a default_scope.  Do you feel strongly that a default scope is not for you?  SoftDelete can be included without a default scope:

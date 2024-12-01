@@ -5,6 +5,7 @@ module SoftDelete
     extend ActiveSupport::Concern
     @@soft_delete_dependency_behavior = nil
     @@include_default_scope = true
+    @@skip_dependent_soft_delete = []
 
     included do
       if @@include_default_scope
@@ -33,9 +34,10 @@ module SoftDelete
     # fire off the same action that is described by ar dsl
     # soft_delete
     # if dsl is :destroy, then override with a soft_delete
-    def self.dependent(behavior = :ignore)
+    def self.dependent(behavior = :ignore, skip_dependent_soft_delete: [])
       raise ArgumentError unless %i[ignore default soft_delete].include? behavior
 
+      @@skip_dependent_soft_delete = skip_dependent_soft_delete
       @@soft_delete_dependency_behavior = behavior
       self
     end
@@ -78,14 +80,16 @@ module SoftDelete
         next unless assn.options[:dependent] == :destroy
 
         # TODO: pass in validate
-        if assn.load_target.respond_to?(:each)
-          assn.load_target.each(&:soft_delete!)
-        else
-          assn.load_target.soft_delete!
+        associated_records = Array(assn.load_target)
+        if @@skip_dependent_soft_delete.include?(associated_records.first.class.name)
+          # see:
+          # https://github.com/rails/rails/blob/master/activerecord/lib/active_record/associations/collection_association.rb#L174
+          assn.reset
+          assn.loaded!
+          next
         end
+        associated_records.each(&:soft_delete!)
 
-        # see:
-        # https://github.com/rails/rails/blob/master/activerecord/lib/active_record/associations/collection_association.rb#L174
         assn.reset
         assn.loaded!
       end
