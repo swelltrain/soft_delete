@@ -71,6 +71,11 @@ module SoftDelete
       end
     end
 
+    # See:
+    # https://github.com/rails/rails/blob/a725732b3dee53a102d62cb193c02dc886bbb7ea/activerecord/lib/active_record/associations/has_one_association.rb#L9
+    # https://github.com/rails/rails/blob/a725732b3dee53a102d62cb193c02dc886bbb7ea/activerecord/lib/active_record/associations/belongs_to_association.rb#L7
+    # https://github.com/rails/rails/blob/a725732b3dee53a102d62cb193c02dc886bbb7ea/activerecord/lib/active_record/associations/has_many_association.rb#L14
+    #
     def handle_normal_dependencies
       soft_delete_dependent_associations.each(&:handle_dependency)
     end
@@ -82,14 +87,14 @@ module SoftDelete
         # TODO: pass in validate
         associated_records = Array(assn.load_target)
         if @@skip_dependent_soft_delete.include?(associated_records.first.class.name)
-          # see:
-          # https://github.com/rails/rails/blob/master/activerecord/lib/active_record/associations/collection_association.rb#L174
-          assn.reset
-          assn.loaded!
+          # It is skipped so follow through with default destroy
+          #
+          associated_records.each(&:destroy!)
           next
         end
         associated_records.each(&:soft_delete!)
-
+        # see:
+        # https://github.com/rails/rails/blob/master/activerecord/lib/active_record/associations/collection_association.rb#L174
         assn.reset
         assn.loaded!
       end

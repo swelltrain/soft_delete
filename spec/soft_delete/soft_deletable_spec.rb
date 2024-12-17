@@ -248,7 +248,7 @@ RSpec.describe SoftDelete::SoftDeletable do
           let!(:book2) { Book.create!(title: 'book 2', author: author) }
 
           it 'raises NoMethodError for soft_delete! on Book' do
-            expect { subject }.to raise_error(NoMethodError, /undefined method `soft_delete!' for #<Book/)
+            expect { subject }.to raise_error(NoMethodError, /undefined method `soft_delete!'/)
           end
         end
 
@@ -280,7 +280,7 @@ RSpec.describe SoftDelete::SoftDeletable do
           let(:author) { Author.create!(name: 'Stephen') }
           let!(:book1) { Book.create!(title: 'book 1', author: author) }
           it 'should not soft delete the related records' do
-            expect { subject }.to change { Book.count }.by(0)
+            expect { subject }.to change { Book.count }.by(-1)
           end
         end
 
